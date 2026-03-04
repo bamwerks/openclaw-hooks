@@ -44,6 +44,34 @@ Silently logs [FORGE workflow](https://bamwerks.info/forge) phase transitions to
 
 ---
 
+---
+
+## Bamwerks-Specific Hooks
+
+The following hooks are tailored to Bamwerks' internal FORGE enforcement workflow. They are included here for reference and inspiration — you'll likely want to adapt them to your own team's conventions.
+
+Located in `hooks/bamwerks/`.
+
+### 🚨 sir-implements-detector
+
+Detects when the main orchestrator agent (Sir) directly implements code or performs builder-role tasks instead of dispatching to sub-agents. Logs FORGE violations and injects corrective nudges to redirect behavior.
+
+**Events:** `message:sent`  
+**Config:** None required  
+**Note:** Bamwerks-specific — references Sir's role and FORGE orchestration rules.
+
+---
+
+### ⚡ phase0-reminder
+
+Injects a Phase 0 discipline reminder before every non-trivial message the orchestrator receives. Enforces the classify → verify understanding → check actual state workflow before any action is taken.
+
+**Events:** `message:received`  
+**Config:** None required  
+**Note:** Bamwerks-specific — tuned to Sir's FORGE Phase 0 checklist.
+
+---
+
 ## Installation
 
 ```bash
