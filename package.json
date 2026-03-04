@@ -1,0 +1,13 @@
+{
+  "name": "@bamwerks/openclaw-hooks",
+  "version": "0.1.0",
+  "description": "OpenClaw hooks built by Bamwerks — open source automation for the OpenClaw agent platform",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bamwerks/openclaw-hooks"
+  },
+  "openclaw": {
+    "hooks": ["./hooks/subagent-ping"]
+  }
+}
