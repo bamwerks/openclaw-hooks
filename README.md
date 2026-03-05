@@ -99,6 +99,10 @@ Bamwerks operates on the principle that governance-first AI infrastructure shoul
 
 Built with [FORGE methodology](https://bamwerks.info/docs/forge-methodology).
 
+## See Also
+
+[openclaw-starter](https://github.com/bamwerks/openclaw-starter) — production pipeline patterns that use these hooks, including memory architecture, swarm templates, and macOS service setup.
+
 ## License
 
 MIT
