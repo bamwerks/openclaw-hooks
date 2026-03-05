@@ -33,7 +33,7 @@ State is persisted to `/tmp/openclaw-session-cost-<sessionKey>.json` (ephemeral,
 
 ### 🔏 forge-phase-tracker
 
-Silently logs [FORGE workflow](https://bamwerks.info/forge) phase transitions to a persistent audit trail. Watches inbound messages for phase keywords (Phase 0–4) and appends structured entries to `workspace/memory/forge-activity.log`. No user-facing output.
+Silently logs [FORGE workflow](https://bamwerks.info/docs/forge-methodology) phase transitions to a persistent audit trail. Watches inbound messages for phase keywords (Phase 0–4) and appends structured entries to `workspace/memory/forge-activity.log`. No user-facing output.
 
 **Events:** `message:received`  
 **Config:** None required  
@@ -54,11 +54,11 @@ Located in `hooks/bamwerks/`.
 
 ### 🚨 sir-implements-detector
 
-Detects when the main orchestrator agent (Sir) directly implements code or performs builder-role tasks instead of dispatching to sub-agents. Logs FORGE violations and injects corrective nudges to redirect behavior.
+Detects when the primary orchestrator agent directly implements code or performs builder-role tasks instead of dispatching to sub-agents. Logs FORGE violations and injects corrective nudges to redirect behavior.
 
 **Events:** `message:sent`  
 **Config:** None required  
-**Note:** Bamwerks-specific — references Sir's role and FORGE orchestration rules.
+**Note:** Bamwerks-specific — references the orchestrator role and FORGE orchestration rules.
 
 ---
 
@@ -68,7 +68,7 @@ Injects a Phase 0 discipline reminder before every non-trivial message the orche
 
 **Events:** `message:received`  
 **Config:** None required  
-**Note:** Bamwerks-specific — tuned to Sir's FORGE Phase 0 checklist.
+**Note:** Bamwerks-specific — tuned to the orchestrator's FORGE Phase 0 checklist.
 
 ---
 
@@ -94,7 +94,7 @@ openclaw hooks enable <hook-name>
 
 Bamwerks operates on the principle that governance-first AI infrastructure should be accessible to everyone. We build for our own needs, then open-source what works.
 
-Built with [FORGE methodology](https://bamwerks.info/forge).
+Built with [FORGE methodology](https://bamwerks.info/docs/forge-methodology).
 
 ## License
 

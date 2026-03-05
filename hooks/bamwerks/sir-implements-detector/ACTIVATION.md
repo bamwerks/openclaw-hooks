@@ -1,6 +1,6 @@
 # Activation Instructions
 
-To enable the `sir-implements-detector` hook, Sir must add the following to `openclaw.json` under `hooks.internal.entries`:
+To enable the `sir-implements-detector` hook, your orchestrator agent must add the following to `openclaw.json` under `hooks.internal.entries`:
 
 ```json
 "sir-implements-detector": {
@@ -22,4 +22,4 @@ Before calling write, edit, or exec (non-read operations):
 There is no "quick fix" exception. There is no "one-liner" exception. Dispatch the work.
 ```
 
-Both changes require Sir's review before application. Do not auto-apply.
+Both changes require your orchestrator's review before application. Do not auto-apply.

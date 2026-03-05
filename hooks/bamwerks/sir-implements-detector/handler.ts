@@ -1,7 +1,7 @@
 /**
  * sir-implements-detector — Bamwerks OpenClaw Hook
  *
- * Enforces the FORGE rule: "Sir orchestrates, NEVER implements."
+ * Enforces the FORGE rule: "Orchestrator coordinates, never implements."
  * Detects when the main session agent directly writes code, edits files,
  * or runs implementation scripts instead of dispatching to a builder.
  *
@@ -18,7 +18,7 @@ const WORKSPACE = "/opt/openclaw/.openclaw/workspace";
 const VIOLATION_LOG = path.join(WORKSPACE, "memory", "forge-violations.log");
 
 /**
- * Workspace paths Sir is allowed to write/edit (orchestrator maintenance).
+ * Workspace paths the orchestrator is allowed to write/edit (orchestrator maintenance).
  * Anything else = violation.
  */
 const WORKSPACE_WRITE_ALLOWLIST = [
@@ -32,7 +32,7 @@ const WORKSPACE_WRITE_ALLOWLIST = [
   path.join(WORKSPACE, "memory"),       // daily logs
   path.join(WORKSPACE, "agents"),       // design docs, workflows
   path.join(WORKSPACE, "hooks"),        // hook development
-  path.join(WORKSPACE, "scripts"),      // utility scripts Sir may update
+  path.join(WORKSPACE, "scripts"),      // utility scripts the orchestrator may update
 ];
 
 /**
@@ -56,7 +56,7 @@ const SOURCE_PATH_PATTERN = /(?:\/opt\/openclaw\/projects|~\/agentic|\.js|\.ts|\
 
 /**
  * Large code block detection: fenced code blocks over N lines suggest
- * Sir wrote implementation code inline.
+ * the orchestrator wrote implementation code inline.
  */
 const CODE_BLOCK_MIN_LINES = 25;
 
@@ -103,7 +103,7 @@ function detectViolation(body: string): { violated: boolean; reason: string } {
     }
   }
 
-  // Check large inline code blocks (Sir shouldn't produce raw implementations)
+  // Check large inline code blocks (orchestrator shouldn't produce raw implementations)
   if (hasLargeCodeBlock(body)) {
     // Large code block alone is suspicious but not definitive.
     // Only flag if combined with an implementation phrase (no source path required).
@@ -147,7 +147,7 @@ function buildNudge(violationCount: number): string {
   if (violationCount === 1) {
     return (
       "\n\n---\n" +
-      "⚠️ **FORGE REMINDER** — Sir orchestrates, never implements. " +
+      "⚠️ **FORGE REMINDER** — The orchestrator coordinates, never implements. " +
       "If you've directly written code or edited source files, that's a FORGE violation. " +
       "Dispatch the work to a builder sub-agent and let them implement. " +
       "Violation logged to `memory/forge-violations.log`."
@@ -158,7 +158,7 @@ function buildNudge(violationCount: number): string {
       `🚨 **FORGE VIOLATION #${violationCount} THIS SESSION** — ` +
       "Direct implementation detected again. This requires a retrospective entry in today's memory file: " +
       "what happened, root cause, prevention. " +
-      "Sir's role is orchestration only. Dispatch a builder. " +
+      "The orchestrator's role is coordination only. Dispatch a builder. " +
       `Violation #${violationCount} logged to \`memory/forge-violations.log\`.`
     );
   }
@@ -181,7 +181,7 @@ const handler = async (event: {
   // Only handle outbound messages
   if (event.type !== "message" || event.action !== "sent") return;
 
-  // Only enforce on the main session (Sir), not on sub-agents
+  // Only enforce on the main session (orchestrator), not on sub-agents
   if (!isMainSession(event.sessionKey)) return;
 
   const body = event.context?.body ?? "";

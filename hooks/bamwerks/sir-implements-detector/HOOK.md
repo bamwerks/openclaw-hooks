@@ -1,6 +1,6 @@
 ---
 name: sir-implements-detector
-description: "Detects when Sir (main session orchestrator) directly implements instead of orchestrating. Logs FORGE violations and injects corrective nudges."
+description: "Detects when the primary orchestrator agent directly implements instead of orchestrating. Logs FORGE violations and injects corrective nudges."
 homepage: https://github.com/bamwerks/openclaw-hooks
 metadata:
   {
@@ -14,12 +14,12 @@ metadata:
 
 # Sir Implements Detector Hook
 
-Enforces the FORGE principle: **Sir orchestrates, NEVER implements.**
+Enforces the FORGE principle: **The orchestrator coordinates, never implements.**
 
 ## What It Does
 
 - Listens for outbound messages from the main session
-- Scans for signals that Sir directly wrote code, edited files, or ran implementation scripts
+- Scans for signals that the orchestrator directly wrote code, edited files, or ran implementation scripts
 - Logs violations to `memory/forge-violations.log`
 - Injects a graduated corrective nudge (soft warning → hard warning on repeat violations)
 
@@ -30,7 +30,7 @@ Enforces the FORGE principle: **Sir orchestrates, NEVER implements.**
 - Mention of using `write` or `edit` tool on source code files
 - Large inline code blocks (>20 lines) without a prior sub-agent dispatch in context
 
-**Workspace exception paths (Sir may write these — NOT violations):**
+**Workspace exception paths (orchestrator may write these — NOT violations):**
 - `workspace/MEMORY.md`, `workspace/SOUL.md`, `workspace/AGENTS.md`
 - `workspace/memory/` — daily logs
 - `workspace/agents/notes/` — design docs
