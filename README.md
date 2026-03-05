@@ -1,5 +1,8 @@
 # Bamwerks OpenClaw Hooks
 
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![OpenClaw Compatible](https://img.shields.io/badge/OpenClaw-compatible-blue.svg)](https://github.com/openclaw/openclaw)
+
 Open source automation hooks for the [OpenClaw](https://github.com/openclaw/openclaw) agent platform, built by [Bamwerks](https://bamwerks.info).
 
 > "Any capability we create, we share." — Bamwerks
