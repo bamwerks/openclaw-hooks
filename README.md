@@ -5,7 +5,7 @@
 
 Open source automation hooks for the [OpenClaw](https://github.com/openclaw/openclaw) agent platform, built by [Bamwerks](https://bamwerks.info).
 
-> "Any capability we create, we share." — Bamwerks
+> "Build in public. Govern seriously." — Bamwerks
 
 ## Hooks
 
