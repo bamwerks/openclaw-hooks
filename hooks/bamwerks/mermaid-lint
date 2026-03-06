@@ -1,0 +1,79 @@
+#!/bin/bash
+# mermaid-lint — warn when staged .md files contain ASCII diagram patterns
+# Soft warn only — does not block commits
+
+STAGED_MD=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E '\.md$' || true)
+[[ -z "$STAGED_MD" ]] && exit 0
+
+WARNINGS=0
+for file in $STAGED_MD; do
+  [[ ! -f "$file" ]] && continue
+
+  result=$(python3 - "$file" << 'PYEOF'
+import sys, re
+
+filepath = sys.argv[1]
+box_chars = set('┌┐└┘├┤┬┴┼─│╔╗╚╝╠╣╦╩╬═║▼▲◄►→←↑↓')
+
+try:
+    with open(filepath, encoding='utf-8') as f:
+        lines = f.readlines()
+except:
+    sys.exit(0)
+
+in_mermaid = False
+in_code = False
+consecutive = 0
+flagged_line = None
+
+for i, line in enumerate(lines, 1):
+    stripped = line.rstrip()
+    if stripped.startswith('```mermaid'):
+        in_mermaid = True
+        consecutive = 0
+        continue
+    if in_mermaid and stripped.startswith('```'):
+        in_mermaid = False
+        continue
+    if in_mermaid:
+        continue
+    if stripped.startswith('```'):
+        in_code = not in_code
+        consecutive = 0
+        continue
+    if in_code:
+        continue
+
+    box_count = sum(1 for c in stripped if c in box_chars)
+    if box_count >= 2:
+        consecutive += 1
+    else:
+        consecutive = 0
+
+    if consecutive >= 3 and flagged_line is None:
+        flagged_line = i
+
+if flagged_line:
+    print(f"line:{flagged_line}")
+PYEOF
+)
+
+  if [[ -n "$result" ]]; then
+    line_num=$(echo "$result" | cut -d: -f2)
+    echo "⚠️  MERMAID-LINT: $file contains ASCII diagram art (around line $line_num)"
+    echo "   Consider replacing with a Mermaid code block:"
+    echo "   \`\`\`mermaid"
+    echo "   graph TD"
+    echo "       A[Node] --> B[Node]"
+    echo "   \`\`\`"
+    echo "   Reference: https://mermaid.js.org"
+    echo ""
+    WARNINGS=$((WARNINGS + 1))
+  fi
+done
+
+if [[ $WARNINGS -gt 0 ]]; then
+  echo "💡 Mermaid-lint: $WARNINGS advisory warning(s) — commit proceeds normally"
+fi
+
+exit 0

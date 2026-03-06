@@ -75,6 +75,20 @@ Injects a Phase 0 discipline reminder before every non-trivial message the orche
 
 ---
 
+### 📐 mermaid-lint
+
+Warns when staged `.md` files contain ASCII diagram art — encourages use of Mermaid diagrams instead of ASCII box art. Soft warn only — does not block commits.
+
+**Events:** pre-commit (git hook)  
+**Config:** None required  
+**Note:** Detects 3+ consecutive lines with box-drawing characters outside existing mermaid/code blocks.
+
+| Hook | Description |
+|------|-------------|
+| `mermaid-lint` | Warns when staged `.md` files contain ASCII diagram art — encourages Mermaid |
+
+---
+
 ## Installation
 
 ```bash
