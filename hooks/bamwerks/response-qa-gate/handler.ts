@@ -8,14 +8,11 @@
  * Fails open: any error or timeout allows the original response through.
  */
 
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
-import { execSync } from "child_process";
+import fs from "fs";
 
 const QA_TIMEOUT_MS = 45_000;
-const QA_MODEL = "claude-haiku-3-5-20241022";
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
 interface ResponseBeforeDeliverEvent {
   type: "response";
@@ -39,49 +36,29 @@ interface HookResult {
 }
 
 /**
- * Read the Anthropic API key from keychain or config.
- * Returns null if not found — hook will fail open.
+ * Read the Anthropic OAuth token from auth-profiles.json.
+ * Returns null if not found or invalid.
  */
-function getAnthropicApiKey(): string | null {
+function getAnthropicToken(): string | null {
   try {
-    const fromKeychain = execSync(
-      "security find-generic-password -s 'openclaw-secrets' -a 'anthropic-token' -w 2>/dev/null",
-      { encoding: "utf8", timeout: 5000 }
-    ).trim();
-    if (fromKeychain && fromKeychain.startsWith("sk-")) {
-      return fromKeychain;
-    }
-  } catch {
-    // keychain read failed — try config
-  }
-
-  try {
-    const configPath = path.join(
-      process.env.OPENCLAW_HOME || path.join(os.homedir(), ".openclaw"),
-      "openclaw.json"
-    );
-    const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
-    const apiKey =
-      config?.models?.providers?.anthropic?.apiKey ||
-      config?.providers?.anthropic?.apiKey;
-    if (apiKey && apiKey.startsWith("sk-")) {
-      return apiKey;
-    }
-  } catch {
-    // config read failed
-  }
-
+    const authPath = '/opt/openclaw/.openclaw/agents/main/agent/auth-profiles.json';
+    const store = JSON.parse(fs.readFileSync(authPath, 'utf8'));
+    const token = store?.profiles?.['anthropic:default']?.token;
+    if (token && token.startsWith('sk-ant-')) return token;
+  } catch {}
   return null;
 }
 
 /**
- * Call the Anthropic Messages API directly with a timeout.
- * Returns the raw text content of the first message block.
+ * Call the Anthropic Messages API with a timeout.
+ * Returns the raw text content of the first content block.
  */
-async function callAnthropicHaiku(
-  prompt: string,
-  apiKey: string
-): Promise<string> {
+async function callAnthropicHaiku(prompt: string): Promise<string> {
+  const token = getAnthropicToken();
+  if (!token) {
+    throw new Error("No Anthropic token available");
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), QA_TIMEOUT_MS);
 
@@ -90,11 +67,11 @@ async function callAnthropicHaiku(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
+        "x-api-key": token,
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: QA_MODEL,
+        model: ANTHROPIC_MODEL,
         max_tokens: 256,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -139,9 +116,10 @@ const handler = async (event: unknown): Promise<HookResult | void> => {
     return;
   }
 
-  const apiKey = getAnthropicApiKey();
-  if (!apiKey) {
-    console.error("[response-qa-gate] No Anthropic API key found — failing open");
+  // Check token availability before proceeding
+  const token = getAnthropicToken();
+  if (!token) {
+    console.error("[response-qa-gate] No Anthropic token found — failing open");
     return;
   }
 
@@ -164,13 +142,12 @@ Reply with ONLY one of:
 
 Be conservative — only fail if there's a clear, obvious problem. When in doubt, PASS.`;
 
-    const result = await callAnthropicHaiku(qaPrompt, apiKey);
+    const result = await callAnthropicHaiku(qaPrompt);
     console.log(`[response-qa-gate] QA result: ${result.slice(0, 100)}`);
 
     if (result.toUpperCase().startsWith("FAIL")) {
       const reason = result.replace(/^FAIL:\s*/i, "").trim();
       console.warn(`[response-qa-gate] QA FAILED — cancelling response. Reason: ${reason}`);
-      // Cancel and let the agent retry
       return {
         cancel: true,
         cancelReason: `QA gate flagged a logic flaw: ${reason}. Please reconsider and correct your response.`,
